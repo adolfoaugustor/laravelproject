@@ -19,13 +19,7 @@ class ClienteApiController extends Controller
     {
         $cliente = new Cliente();
         $this->validate($request, $cliente->rules());
-        
         $dataForm = $request->all();
-        // if($request->hasFile('image')){
-        //     $name = uniqid(date('HisYmd'));
-        //     $path = $request->image->store($name, 'clientes');
-        //     $dataForm['image'] = $path;
-        // }
         
         if($request->hasFile('image') && $request->file('image')->isValid()){
             $extension = $request->image->extension();
@@ -40,7 +34,7 @@ class ClienteApiController extends Controller
             }
         }
         $data = $cliente->create($dataForm);
-        // dd($dataForm);
+    
         return response()->json($data, 201);
     }
 
