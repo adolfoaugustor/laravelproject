@@ -6,6 +6,7 @@ use App\Models\Cliente;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\Storage;
 
 class ClienteApiController extends Controller
 {
@@ -40,7 +41,11 @@ class ClienteApiController extends Controller
 
     public function show($id)
     {
-        //
+        if(!$data = Cliente::find($id)){
+            return response()->json(['error' => 'Nenhum Cliente foi encontrado!'], 404);
+        }else{
+            return response()->json($data, 201);
+        }
     }
 
     public function update(Request $request, $id)
@@ -50,6 +55,14 @@ class ClienteApiController extends Controller
 
     public function destroy($id)
     {
-        //
+        if(!$data = Cliente::find($id)){
+            return response()->json(['error' => 'Nenhum Cliente foi encontrado!'], 404);
+        if($data->image){
+            Storage::disk('public')->delete('/clientes/$data->image');
+        }
+        
+        $data->delete();
+        return response()->json(['success' => 'Deletado com sucesso!!']);
     }
+    
 }
