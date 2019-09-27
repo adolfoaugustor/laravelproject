@@ -50,10 +50,11 @@ class ClienteApiController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($data = Cliente::find($id));
         if(!$data = Cliente::find($id))
             return response()->json(['error' => 'Nenhum Cliente foi encontrado!'], 404);
         
-        $this->validate($request, $cliente->rules());
+        $this->validate($request, $data->rules());
         $dataForm = $request->all();
         
         if($request->hasFile('image') && $request->file('image')->isValid()){
