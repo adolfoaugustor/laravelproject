@@ -4,23 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
-use App\Http\Controllers\MasterApiController;
+use App\Http\Controllers\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
 
-class ClienteApiController extends MasterApiController
+class ClienteApiController extends Controller
 {
-    // protected $model;
-    // protected $path = 'clientes';
-
-    // protected $model;
-    // protected $path = 'clientes';
-
-    // public function __construc(Cliente $clientes, Request $request)
-    // {
-    //     this->model = $clientes;
-    //     this->request = $request;
-    // }
     public function index()
     {
         $cliente = Cliente::all();
@@ -38,7 +27,6 @@ class ClienteApiController extends MasterApiController
         }
 
         $data = $cliente->create($dataForm);
-    
         return response()->json($data, 201);
     }
 
