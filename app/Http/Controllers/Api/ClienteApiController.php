@@ -22,20 +22,11 @@ class ClienteApiController extends Controller
         $this->validate($request, $cliente->rules());
         $dataForm = $request->all();
         
-        if($request->hasFile('image') && $request->file('image')->isValid()){
-            $extension = $request->image->extension();
-            $name = uniqid(date('His'));
-            $nameFile = "{$name}.{$extension}";
-            $upload = Image::make($dataForm['image'])->resize(177, 236)->save(storage_path("app/public/clientes/$nameFile", 70));
-            
-            if(!$upload){
-                return response()->json(['error'=>'Falha ao fazer o upload!'], 500);
-            }else{
-                $dataForm['image'] = $nameFile;
-            }
+        if($request->hasFile('image')){
+            $dataForm['image'] = $request->image->store('clients', 'public');
         }
+
         $data = $cliente->create($dataForm);
-    
         return response()->json($data, 201);
     }
 
@@ -50,33 +41,22 @@ class ClienteApiController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($data = Cliente::find($id));
         if(!$data = Cliente::find($id))
             return response()->json(['error' => 'Nenhum Cliente foi encontrado!'], 404);
         
         $this->validate($request, $data->rules());
         $dataForm = $request->all();
         
-        if($request->hasFile('image') && $request->file('image')->isValid()){
-
-            if($data->image){
-                Storage::disk('clientes')->delete($data->image);
+        if($request->hasFile('image')){
+            if($request->image){
+                if(Storage::disk('public')->exists($dataForm->image)){
+                    Storage::disk('public')->delete($dataForm->image);
+                }
             }
-
-            $extension = $request->image->extension();
-            $name = uniqid(date('His'));
-            $nameFile = "{$name}.{$extension}";
-            
-            $upload = Image::make($dataForm['image'])->resize(177, 236)->save(storage_path("app/public/clientes/$nameFile", 70));
-            
-            if(!$upload){
-                return response()->json(['error'=>'Falha ao fazer o upload!'], 500);
-            }else{
-                $dataForm['image'] = $nameFile;
-            }
+            $dataForm['image'] = $request->image->store('clients', 'public');
         }
-        $data->update($dataForm);
-    
+
+        $data->update($dataForm);  
         return response()->json($data, 201);
     }
 
@@ -85,7 +65,9 @@ class ClienteApiController extends Controller
         if(!$data = Cliente::find($id))
             return response()->json(['error' => 'Nenhum Cliente foi encontrado!'], 404);
         if($data->image){
-            Storage::disk('clientes')->delete($data->image);
+            if(Storage::disk('public')->exists($data->image)){
+                Storage::disk('public')->delete($data->image);
+            }
         }
         
         $data->delete();
